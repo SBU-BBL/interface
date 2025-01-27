@@ -14,6 +14,8 @@ import {
   Send,
   Settings2,
   SquareTerminal,
+  GalleryVerticalEnd,
+  AudioWaveform,
 } from "lucide-react"
 
 import { NavMain } from "@/components/nav-main"
@@ -31,8 +33,26 @@ import {
 } from "@/components/ui/sidebar"
 import { useWeb3Auth } from "@/context/Web3AuthContext"
 import { useWalletClient } from "wagmi"
+import { TeamSwitcher } from "./team-switcher"
 
 const data = {
+  teams: [
+    {
+      name: "SBU BBL",
+      logo: Coins,
+      plan: "Tasks",
+    },
+    {
+      name: "CommPutation",
+      logo: AudioWaveform,
+      plan: "Startup",
+    },
+    {
+      name: "Some Group",
+      logo: Command,
+      plan: "Tasks",
+    },
+  ],
   navMain: [
     {
       title: "Dashboard",
@@ -100,6 +120,7 @@ export function AppSidebar({ ...props }) {
 
   useEffect(() => {
     const getUserInfo = async () => {
+      console.log("web3Auth", web3Auth);
       try {
         var userInfo = await web3Auth?.getUserInfo();
       } catch (e) {
@@ -120,7 +141,7 @@ export function AppSidebar({ ...props }) {
   return (
     <Sidebar variant="inset" {...props}>
       <SidebarHeader>
-        <SidebarMenu>
+        {/* <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton size="lg" asChild>
               <a href="#">
@@ -134,7 +155,8 @@ export function AppSidebar({ ...props }) {
               </a>
             </SidebarMenuButton>
           </SidebarMenuItem>
-        </SidebarMenu>
+        </SidebarMenu> */}
+        <TeamSwitcher teams={data.teams} />
       </SidebarHeader>
       <SidebarContent>
         <NavMain items={data.navMain} />

@@ -30,7 +30,7 @@ export default function LoginPage() {
 
   useEffect(() => {
     if (isConnected) {
-      router.push("/dashboard");
+      router.push("/onboarding");
     }
   }, [isConnected, router]);
 

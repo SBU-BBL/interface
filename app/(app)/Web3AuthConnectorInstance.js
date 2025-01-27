@@ -6,6 +6,7 @@ import { CHAIN_NAMESPACES, WEB3AUTH_NETWORK, UX_MODE } from "@web3auth/base";
 import { Chain } from "wagmi/chains";
 import { WalletServicesPlugin } from "@web3auth/wallet-services-plugin";
 import { AuthAdapter } from "@web3auth/auth-adapter";
+import { AccountAbstractionProvider, KernelSmartAccount } from "@web3auth/account-abstraction-provider";
 
 export function Web3AuthConnectorInstance(web3AuthInstance, provider) {
   return new Web3AuthConnector({
@@ -35,21 +36,22 @@ export function Web3AuthInstance(chains) {
     clientId: "BEbV53dD1PMIzVp6jM2m4FfbuPN1HhcAMe4Sgh5ioZ63fBp27zy10eL5wsgyblniJ9p0pgI4r9PRCKszix14u5U",
     chainConfig,
     privateKeyProvider,
-    uiConfig: {
-      appName: name,
-      defaultLanguage: "en",
-      logoLight: "https://web3auth.io/images/web3authlog.png",
-      logoDark: "https://web3auth.io/images/web3authlogodark.png",
-      mode: "light",
-    },
+    // uiConfig: {
+    //   appName: name,
+    //   defaultLanguage: "en",
+    //   logoLight: "https://web3auth.io/images/web3authlog.png",
+    //   logoDark: "https://web3auth.io/images/web3authlogodark.png",
+    //   mode: "light",
+    // },
     web3AuthNetwork: WEB3AUTH_NETWORK.SAPPHIRE_DEVNET,
-    enableLogging: true,
+    // enableLogging: true,
+    useAAWithExternalWallet: true,
   });
 
   const authAdapter = new AuthAdapter({
-    adapterSettings: {
-      uxMode: UX_MODE.REDIRECT,
-    }
+    // adapterSettings: {
+    //   uxMode: UX_MODE.REDIRECT,
+    // }
   });
 
   web3AuthInstance.configureAdapter(authAdapter);

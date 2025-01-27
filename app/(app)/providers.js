@@ -2,7 +2,7 @@
 
 import { WagmiProvider, createConfig, http, useAccount, useConnect, useDisconnect } from "wagmi";
 import { coinbaseWallet, walletConnect } from "wagmi/connectors";
-import { sepolia, mainnet, polygon, base } from "wagmi/chains";
+import { sepolia, mainnet, polygon, base, baseSepolia } from "wagmi/chains";
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query' 
 
 import { Web3AuthInstance, Web3AuthConnectorInstance } from "./Web3AuthConnectorInstance";
@@ -10,15 +10,22 @@ import { Web3AuthProvider } from "@/context/Web3AuthContext";
 
 const queryClient = new QueryClient()
 
-const chainsAllowed = [base];
+const chainsAllowed = [
+  //base,
+  baseSepolia
+];
 
 const web3AuthInstance = Web3AuthInstance(chainsAllowed);
 
 // Set up client
 const config = createConfig({
-  chains: [mainnet, sepolia, polygon],
+  chains: [
+    //base, 
+    baseSepolia
+  ],
   transports: {
-    [base.id]: http(),
+    //[base.id]: http(),
+    [baseSepolia.id]: http(),
   },
   connectors: [
     Web3AuthConnectorInstance(web3AuthInstance, "google"),
