@@ -13,6 +13,7 @@ export const POST = async (request) => {
         taskDescription,
         taskBalance,
         communityId,
+        projId,
         address,
         deadline,
     } = await request.json();
@@ -21,6 +22,7 @@ export const POST = async (request) => {
 
     const task = {
         creator: address,
+        projectId: projectId,
         taskName: taskName,
         taskDescription: taskDescription,
         taskBalance: taskBalance,
@@ -31,8 +33,8 @@ export const POST = async (request) => {
     };
     await redis.hset(taskId, task);
 
-    const communityTasks = communityId + ":tasks";
-    await redis.sadd(communityTasks, taskId);
+    const projectTasks = communityId + ":" + projId + ":tasks";
+    await redis.sadd(projectTasks, taskId);
 
     const userTasks = communityId + ":" + address + ":tasks";
     await redis.sadd(userTasks, taskId);

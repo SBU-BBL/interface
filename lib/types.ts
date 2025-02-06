@@ -11,3 +11,14 @@ export interface Task {
   creator: string
 }
 
+export interface Project {
+  id: string
+  title: string
+  description: string
+  balance: number
+  teamLeader: string
+  teamCoLeaders: string[]
+  deadline: string
+  createdAt: string
+  status: "active" | "completed" | "on-hold"
+}

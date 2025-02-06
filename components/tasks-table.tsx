@@ -87,7 +87,7 @@ export function TasksTable({ tasks, onTaskClick, onEdit, onDelete }: TasksTableP
         const users = row.getValue("users") as string[]
         return (
           <div className="flex -space-x-2">
-            {users.slice(0, 3).map((person, index) => (
+            {users?.slice(0, 3).map((person, index) => (
               <Avatar key={index} className="h-8 w-8 border-2 border-background">
                 <AvatarFallback>
                   {person
@@ -98,7 +98,7 @@ export function TasksTable({ tasks, onTaskClick, onEdit, onDelete }: TasksTableP
                 </AvatarFallback>
               </Avatar>
             ))}
-            {users.length > 3 && (
+            {users?.length > 3 && (
               <div className="flex items-center justify-center h-8 w-8 rounded-full bg-muted text-muted-foreground text-xs">
                 +{users.length - 3}
               </div>

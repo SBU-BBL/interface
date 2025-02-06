@@ -42,7 +42,7 @@ export function TaskDetails({ task, onEdit, onDelete, onClose }: TaskDetailsProp
             Assigned to:
           </div>
           <div className="flex flex-wrap gap-2">
-            {task.users.map((person, index) => (
+            {task.users?.map((person, index) => (
               <div key={index} className="flex items-center bg-muted rounded-full px-3 py-1">
                 <Avatar className="h-6 w-6 mr-2">
                   <AvatarFallback>

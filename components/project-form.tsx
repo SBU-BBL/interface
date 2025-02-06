@@ -8,49 +8,45 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
-import type { Task } from "@/lib/types"
+import type { Project } from "@/lib/types"
 
-const taskSchema = z.object({
+const projectSchema = z.object({
   title: z.string().min(1, "Title is required"),
   description: z.string().min(1, "Description is required"),
-  status: z.enum(["todo", "in-progress", "done"]),
-  priority: z.enum(["low", "medium", "high"]),
-  reward: z.string().optional(),
+  balance: z.number().min(0, "Balance must be positive"),
+  teamLeader: z.string().min(1, "Team leader is required"),
+  teamCoLeaders: z.array(z.string()).min(1, "At least one co-leader is required"),
   deadline: z.date(),
-  assignedTo: z.array(z.string()).min(1, "Assign to at least one person"),
-  author: z.string().min(1, "Author is required"),
+  status: z.enum(["active", "completed", "on-hold"]),
 })
 
-type TaskFormValues = z.infer<typeof taskSchema>
+type ProjectFormValues = z.infer<typeof projectSchema>
 
-interface TaskFormProps {
-  projectId: string
-  task?: Task
-  onSubmit: (task: Task) => void
+interface ProjectFormProps {
+  project?: Project
+  onSubmit: (project: Project) => void
   onCancel: () => void
 }
 
-export function TaskForm({ projectId, task, onSubmit, onCancel }: TaskFormProps) {
-  const form = useForm<TaskFormValues>({
-    resolver: zodResolver(taskSchema),
-    defaultValues: task || {
+export function ProjectForm({ project, onSubmit, onCancel }: ProjectFormProps) {
+  const form = useForm<ProjectFormValues>({
+    resolver: zodResolver(projectSchema),
+    defaultValues: project || {
       title: "",
       description: "",
-      status: "todo",
-      priority: "medium",
-      reward: "",
+      balance: 0,
+      teamLeader: "",
+      teamCoLeaders: [],
       deadline: new Date(),
-      assignedTo: [],
-      author: "",
+      status: "active",
     },
   })
 
-  const handleSubmit = (values: TaskFormValues) => {
+  const handleSubmit = (values: ProjectFormValues) => {
     onSubmit({
       ...values,
-      id: task?.id || Date.now().toString(),
-      projectId,
-      createdAt: task?.createdAt || new Date().toISOString(),
+      id: project?.id || Date.now().toString(),
+      createdAt: project?.createdAt || new Date().toISOString(),
     })
   }
 
@@ -96,36 +92,13 @@ export function TaskForm({ projectId, task, onSubmit, onCancel }: TaskFormProps)
                   <Select onValueChange={field.onChange} defaultValue={field.value}>
                     <FormControl>
                       <SelectTrigger>
-                        <SelectValue placeholder="Select a status" />
+                        <SelectValue placeholder="Select status" />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      <SelectItem value="todo">To Do</SelectItem>
-                      <SelectItem value="in-progress">In Progress</SelectItem>
-                      <SelectItem value="done">Done</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="priority"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Priority</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select a priority" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      <SelectItem value="low">Low</SelectItem>
-                      <SelectItem value="medium">Medium</SelectItem>
-                      <SelectItem value="high">High</SelectItem>
+                      <SelectItem value="active">Active</SelectItem>
+                      <SelectItem value="completed">Completed</SelectItem>
+                      <SelectItem value="on-hold">On Hold</SelectItem>
                     </SelectContent>
                   </Select>
                   <FormMessage />
@@ -135,6 +108,24 @@ export function TaskForm({ projectId, task, onSubmit, onCancel }: TaskFormProps)
           </div>
 
           <div className="space-y-4">
+            <FormField
+              control={form.control}
+              name="balance"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Balance</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="number"
+                      {...field}
+                      onChange={(e) => field.onChange(Number.parseFloat(e.target.value))}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
             <FormField
               control={form.control}
               name="deadline"
@@ -156,10 +147,24 @@ export function TaskForm({ projectId, task, onSubmit, onCancel }: TaskFormProps)
 
             <FormField
               control={form.control}
-              name="assignedTo"
+              name="teamLeader"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Assigned To</FormLabel>
+                  <FormLabel>Team Leader</FormLabel>
+                  <FormControl>
+                    <Input {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="teamCoLeaders"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Team Co-Leaders</FormLabel>
                   <FormControl>
                     <Input
                       {...field}
@@ -178,34 +183,6 @@ export function TaskForm({ projectId, task, onSubmit, onCancel }: TaskFormProps)
                 </FormItem>
               )}
             />
-
-            <FormField
-              control={form.control}
-              name="author"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Author</FormLabel>
-                  <FormControl>
-                    <Input {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="reward"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Reward (optional)</FormLabel>
-                  <FormControl>
-                    <Input {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
           </div>
         </div>
 
@@ -213,7 +190,7 @@ export function TaskForm({ projectId, task, onSubmit, onCancel }: TaskFormProps)
           <Button type="button" variant="outline" onClick={onCancel}>
             Cancel
           </Button>
-          <Button type="submit">{task ? "Update" : "Create"} Task</Button>
+          <Button type="submit">{project ? "Update" : "Create"} Project</Button>
         </div>
       </form>
     </Form>

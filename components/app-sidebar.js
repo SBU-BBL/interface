@@ -61,8 +61,8 @@ const data = {
       isActive: true,
     },
     {
-      title: "Tasks",
-      url: "/tasks",
+      title: "Projects",
+      url: "/projects",
       icon: Bot,
     },
     {
