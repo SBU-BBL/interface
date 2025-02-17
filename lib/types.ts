@@ -22,3 +22,10 @@ export interface Project {
   createdAt: string
   status: "active" | "completed" | "on-hold"
 }
+
+export interface User {
+  id: string
+  name: string
+  email: string
+  role: "Owner" | "Professor" | "Team Leader" | "Member"
+}
