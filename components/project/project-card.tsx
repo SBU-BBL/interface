@@ -61,19 +61,21 @@ export function ProjectCard({ project, onClick, tasksCount, completedTasksCount 
                     .toUpperCase()}
                 </AvatarFallback>
               </Avatar>
-              {project.teamCoLeaders.slice(0, 2).map((leader, i) => (
-                <Avatar key={i} className="h-8 w-8 border-2 border-background">
-                  <AvatarFallback>
-                    {leader
-                      .split(" ")
-                      .map((n) => n[0])
-                      .join("")
-                      .toUpperCase()}
-                  </AvatarFallback>
-                </Avatar>
+              {(Array.isArray(project.teamCoLeaders) ? project.teamCoLeaders : [])
+                .slice(0, 2)
+                .map((leader, i) => (
+                  <Avatar key={`leader-${i}`} className="h-8 w-8 border-2 border-background">
+                    <AvatarFallback>
+                      {leader
+                        .split(" ")
+                        .map((n) => n[0])
+                        .join("")
+                        .toUpperCase()}
+                    </AvatarFallback>
+                  </Avatar>
               ))}
-              {project.teamCoLeaders.length > 2 && (
-                <div className="flex items-center justify-center h-8 w-8 rounded-full bg-muted text-muted-foreground text-xs border-2 border-background">
+              {(Array.isArray(project.teamCoLeaders) && project.teamCoLeaders.length > 2) && (
+                <div key="extra-leaders" className="flex items-center justify-center h-8 w-8 rounded-full bg-muted text-muted-foreground text-xs border-2 border-background">
                   +{project.teamCoLeaders.length - 2}
                 </div>
               )}

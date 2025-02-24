@@ -3,9 +3,7 @@ import { NextResponse } from 'next/server';
 import { v4 as uuid } from 'uuid';
 
 export const POST = async (request) => {
-    // Parse the request body
     const {
-        //sig
         title,
         description,
         balance,
@@ -19,22 +17,23 @@ export const POST = async (request) => {
     let projId = uuid();
 
     const proj = {
-        creator: address,
-        title: title,
-        description: description,
-        balance: balance,
-        teamLeader: teamLeader,
-        teamCoLeaders: teamCoLeaders,
+        id: projId,
+        title,
+        description,
+        balance,
+        teamLeader,
+        teamCoLeaders,
+        // relationship key for tasks
         tasks: communityId + ":" + projId + ":tasks",
-        isComplete: false,
-        deadline: deadline,
-        dateCreated: new Date().toISOString(),
+        status: "active",
+        deadline,
+        createdAt: new Date().toISOString(),
+        creator: address
     };
     await redis.hset(projId, proj);
 
     const communityProjects = communityId + ":projects";
     await redis.sadd(communityProjects, projId);
 
-    // Return a response to confirm success
-    return NextResponse.json({ success: true, proj: proj });
+    return NextResponse.json({ success: true, proj });
 };

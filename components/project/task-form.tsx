@@ -46,12 +46,20 @@ export function TaskForm({ projectId, task, onSubmit, onCancel }: TaskFormProps)
   })
 
   const handleSubmit = (values: TaskFormValues) => {
-    onSubmit({
-      ...values,
+    const transformedTask = {
       id: task?.id || Date.now().toString(),
+      taskName: values.title,
+      taskDescription: values.description,
+      status: values.status,
+      priority: values.priority,
+      taskBalance: values.reward || "",
+      // Convert deadline to ISO string
+      deadline: new Date(values.deadline).toISOString(),
+      creator: values.author,
       projectId,
       createdAt: task?.createdAt || new Date().toISOString(),
-    })
+    }
+    onSubmit(transformedTask)
   }
 
   return (

@@ -57,7 +57,7 @@ export function ProjectDetails({ project, tasksCount, completedTasksCount }: Pro
               <div className="flex items-center">
                 <Avatar className="h-8 w-8 mr-2">
                   <AvatarFallback>
-                    {project.teamLeader
+                    {(project.teamLeader ?? "")
                       .split(" ")
                       .map((n) => n[0])
                       .join("")
@@ -71,11 +71,11 @@ export function ProjectDetails({ project, tasksCount, completedTasksCount }: Pro
             <div>
               <h3 className="font-semibold mb-2">Co-Leaders</h3>
               <div className="flex flex-wrap gap-2">
-                {project.teamCoLeaders.map((leader, i) => (
+                {(Array.isArray(project.teamCoLeaders) ? project.teamCoLeaders : []).map((leader, i) => (
                   <div key={i} className="flex items-center bg-muted rounded-full px-3 py-1">
                     <Avatar className="h-6 w-6 mr-2">
                       <AvatarFallback>
-                        {leader
+                        {(leader ?? "")
                           .split(" ")
                           .map((n) => n[0])
                           .join("")
