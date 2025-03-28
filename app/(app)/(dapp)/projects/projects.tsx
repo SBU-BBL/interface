@@ -1,12 +1,14 @@
 "use client"
 
-import { useState } from "react"
-import { TasksTable } from "@/components/tasks-table"
-import { TaskDetails } from "@/components/task-details"
-import { TaskForm } from "@/components/task-form"
-import { ProjectCard } from "@/components/project-card"
-import { ProjectDetails } from "@/components/project-details"
-import { ProjectForm } from "@/components/project-form"
+import { useState, useEffect } from "react"
+import { useAtom } from "jotai"
+import { _currentCommunity, selectedProjectAtom } from "@/atoms/user"
+import { TasksTable } from "@/components/project/tasks-table"
+import { TaskDetails } from "@/components/project/task-details"
+import { TaskForm } from "@/components/project/task-form"
+import { ProjectCard } from "@/components/project/project-card"
+import { ProjectDetails } from "@/components/project/project-details"
+import { ProjectForm } from "@/components/project/project-form"
 import { Button } from "@/components/ui/button"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { PlusCircle, ChevronLeft } from "lucide-react"
@@ -21,15 +23,67 @@ export default function TasksPage() {
   const [isTaskDialogOpen, setIsTaskDialogOpen] = useState(false)
   const [editingProject, setEditingProject] = useState<Project | null>(null)
   const [editingTask, setEditingTask] = useState<Task | null>(null)
+  const [currentCommunity] = useAtom(_currentCommunity)
+  const [globalProject, setGlobalProject] = useAtom(selectedProjectAtom)
 
-  const handleAddProject = (newProject: Project) => {
-    setProjects([...projects, newProject])
-    setIsProjectDialogOpen(false)
-  }
+  // Load projects list from the new list API using current community id.
+  useEffect(() => {
+    const loadProjects = async () => {
+      const res = await fetch(`/api/project/list?communityId=${currentCommunity}`)
+      const { projects } = await res.json();
+      setProjects(projects);
+    }
+    loadProjects()
+  }, [currentCommunity])
 
-  const handleAddTask = (newTask: Task) => {
-    setTasks([...tasks, newTask])
-    setIsTaskDialogOpen(false)
+  const handleAddProject = async (newProject: Project) => {
+    const res = await fetch("/api/project/create", {
+      method: "POST", 
+      headers: { "Content-Type": "application/json" },
+      // add communityId using current community state
+      body: JSON.stringify({ communityId: currentCommunity, ...newProject })
+    });
+    const data = await res.json();
+    if (data.success) {
+      setProjects([...projects, data.proj]);
+      setIsProjectDialogOpen(false);
+    }
+  };
+
+  const handleAddTask = async (newTaskData: Task) => {
+    console.log("Submitting new task data:", newTaskData);
+    const projId = globalProject?.id || selectedProject?.id; // Use the full selected project id
+    if (!projId) {
+      console.error("No project selected");
+      return;
+    }
+    try {
+      const res = await fetch("/api/task/create", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          communityId: currentCommunity,
+          projId, // now guaranteed to be a proper project id
+          address: newTaskData.creator,
+          ...newTaskData,
+        }),
+      })
+      const text = await res.text()
+      if (!text) {
+        console.error("Empty response from API")
+        return
+      }
+      const data = JSON.parse(text)
+      console.log("Response data:", data)
+      if (data.success) {
+        setTasks([...tasks, data.task])
+        setIsTaskDialogOpen(false)
+      } else {
+        console.error("Task creation failed:", data)
+      }
+    } catch (err) {
+      console.error("Error adding task:", err)
+    }
   }
 
   const handleUpdateProject = (updatedProject: Project) => {
@@ -121,7 +175,22 @@ export default function TasksPage() {
             <ProjectCard
               key={project.id}
               project={project}
-              onClick={() => setSelectedProject(project)}
+              onClick={async () => {
+                const res = await fetch(`/api/project/get?projectId=${project.id}`);
+                const data = await res.json();
+                const fullProject = data.project || {};
+                console.log("Selected project:", fullProject); // This should show an id field.
+                setSelectedProject(fullProject);
+                setGlobalProject(fullProject);
+                // Safely fetch tasks using the project's tasks relationship key.
+                if(fullProject.tasks) {
+                  const res2 = await fetch(`/api/task/list?taskKey=${encodeURIComponent(fullProject.tasks)}`);
+                  const { tasks } = await res2.json();
+                  setTasks(tasks);
+                } else {
+                  setTasks([]);
+                }
+              }}
               tasksCount={getProjectTasks(project.id).length}
               completedTasksCount={getCompletedTasksCount(project.id)}
             />

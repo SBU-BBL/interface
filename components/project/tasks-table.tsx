@@ -87,7 +87,10 @@ export function TasksTable({ tasks, onTaskClick, onEdit, onDelete }: TasksTableP
         const users = row.getValue("users") as string[]
         return (
           <div className="flex -space-x-2">
-            {users?.slice(0, 3).map((person, index) => (
+            {(Array.isArray(users)
+              ? users
+              : String(users).split(',').map(u => u.trim()).filter(Boolean)
+            ).slice(0, 3).map((person, index) => (
               <Avatar key={index} className="h-8 w-8 border-2 border-background">
                 <AvatarFallback>
                   {person
