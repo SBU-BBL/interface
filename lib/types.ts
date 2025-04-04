@@ -1,8 +1,10 @@
 export interface User {
+  id: string
   name: string
   email: string
   tasksCompleted: number
   balance: number
+  role: "Owner" | "Professor" | "Team Leader" | "Member"
 
   createdAt?: string
   updatedAt?: string
