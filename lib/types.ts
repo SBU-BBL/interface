@@ -1,14 +1,28 @@
+export interface User {
+  id: string
+  name: string
+  email: string
+  tasksCompleted: number
+  balance: number
+  role: "Owner" | "Professor" | "Team Leader" | "Member"
+
+  createdAt?: string
+  updatedAt?: string
+}
+
 export interface Task {
   id: string
-  taskName: string
-  taskDescription: string
+  name: string
+  description: string
   status: "todo" | "in-progress" | "done"
   priority: "low" | "medium" | "high"
-  taskBalance?: string
+  balance: string
   deadline: string
-  createdAt: string
   users: string[]
   creator: string
+
+  createdAt?: string
+  updatedAt?: string
 }
 
 export interface Project {
@@ -19,13 +33,30 @@ export interface Project {
   teamLeader: string
   teamCoLeaders: string[]
   deadline: string
-  createdAt: string
   status: "active" | "completed" | "on-hold"
+
+  createdAt?: string
+  updatedAt?: string
 }
 
-export interface User {
+export interface Organization {
   id: string
   name: string
-  email: string
-  role: "Owner" | "Professor" | "Team Leader" | "Member"
+  description: string
+  affiliation: string
+  admin: string
+  
+  numberOfMembers: number
+  numberOfProjects: number
+  numberOfTasks: number
+
+  newMemberReward: number
+  referralReward: number
+
+  tokenAddress: string
+  tokenName: string
+  tokenSymbol: string
+
+  createdAt?: string
+  updatedAt?: string
 }
