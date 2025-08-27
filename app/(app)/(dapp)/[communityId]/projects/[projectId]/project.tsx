@@ -68,7 +68,10 @@ export default function ProjectPage() {
       })
       .then((data: Project) => {
         setProject(data);
-        if (data.tasks.length) setSelected(data.tasks[0]);
+        setSelected((prev) => {
+          if (!prev) return data.tasks[0] ?? null;
+          return data.tasks.find((t) => t.id === prev.id) ?? data.tasks[0] ?? null;
+        });
       })
       .catch((err) => setError(err.message));
   };
@@ -81,8 +84,13 @@ export default function ProjectPage() {
     if (!communityId || !address) return;
     fetch(`/api/community/${communityId}/members`)
       .then((r) => r.json())
-      .then((members) => {
-        const me = members.find(
+      .then((data) => {
+        const list = Array.isArray(data)
+          ? data
+          : Array.isArray(data?.members)
+          ? data.members
+          : [];
+        const me = list.find(
           (m: any) =>
             m.user.address.toLowerCase() === address.toLowerCase()
         );
@@ -112,7 +120,7 @@ export default function ProjectPage() {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <TasksTable tasks={project.tasks} onSelect={setSelected} />
-        {selectedTask && <TaskDetails task={selectedTask} />}
+        {selectedTask && <TaskDetails task={selectedTask} refresh={refresh} />}
       </div>
 
       <Dialog open={open} onOpenChange={setOpen}>
